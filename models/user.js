@@ -2,7 +2,8 @@ const {Schema, model} = require("mongoose");
 const Joi = require("joi");
 
 const {handleMongooseError} = require("../helpers");
-const { string } = require("joi");
+const { object } = require("joi");
+
 
 const emailRegexp = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/ ;
 
@@ -49,6 +50,10 @@ const registerSchema = Joi.object({
     password: Joi.string().min(6).required(),
 })
 
+const emailSchema = Joi.object({
+  email: Joi.string().pattern(emailRegexp).required(),
+})
+
 const loginSchema = Joi.object({
     email: Joi.string().pattern(emailRegexp).required(),
     password: Joi.string().min(6).required(),
@@ -57,6 +62,7 @@ const loginSchema = Joi.object({
 const schemas = {
     registerSchema,
     loginSchema,
+    emailSchema,
 }
 
 const User = model("user", userSchema);
