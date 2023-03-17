@@ -46,11 +46,11 @@ const verifyEmail = async (req, res) => {
     const { verificationToken } = req.params;
     const user = await User.findOne({ verificationToken });
     if (!user) {
-        throw HttpError(401, "Email not found")
+        throw HttpError(404, "User not found")
     }
     await User.findByIdAndUpdate(user._id, { verify: true, verificationToken: "" });
     res.json({
-        message:"Email verify success"
+        message:"Verification successful"
     })
 }
 
@@ -58,15 +58,15 @@ const resendVerifyEmail = async (req, res) => {
     const { email } = req.body;
     const user = await User.findOne({ email });
     if (!user) {
-        throw HttpError(401, "Email not found")
+        throw HttpError(400, "missing required field email")
     }
     if (user.verify) {
-        throw HttpError(401, "Email already verify")
+        throw HttpError(401, "Verification has already been passed")
     }
     const verifyEmail = {
         to: email,
         subject: "Verify email",
-        html: `<a target="_blanc" href="${BASE_URL}/api/auth/verify/${verificationToken}">Click verify email</a>`
+        html: `<a target="_blanc" href="${BASE_URL}/api/auth/verify/${user.verificationToken}">Click verify email</a>`
     };
     await sendEmail(verifyEmail);
     res.json({
